@@ -1,21 +1,97 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "list.h"
 #include "common.h"
 
+#define DICT_FILE "cities_8.txt"
+
 //#define DEBUG
 
+#ifdef DEBUG
 #define PRINT_ARRAY(i, array)                   \
     do {                                        \
         for (i = 0; i < ARRAY_SIZE(array); i++) \
             printf("%d ", array[i]);            \
         printf("\n");                           \
     } while (0)
+#endif
 
 static uint16_t values[256];
 
-static void list_mergesort(struct list_head *head, int n)
+static void list_mergesort(struct list_head *head, unsigned int n);
+
+int main(void)
+{
+    FILE *dict = fopen(DICT_FILE, "r");
+    char city[32] = {0};
+
+    if (!dict) {
+        fprintf(stderr, "error: file open failed in '%s'.\n", DICT_FILE);
+        fclose(dict);
+    }
+
+    struct list_head testlist;
+    struct listitem *item = NULL, *is = NULL;
+    unsigned int len, i;
+
+    INIT_LIST_HEAD(&testlist);
+
+    assert(list_empty(&testlist));
+
+    i = 0;
+    while (fscanf(dict, "%[^\n]\n", city) != EOF) {
+        printf("%s\n", city);
+
+        len = strlen(city);
+        item = (struct listitem *) malloc(sizeof(*item));
+        assert(item);
+        item->city = (char *) malloc(len + 1);
+        memcpy(item->city, city, len);
+        item->city[len] = 0;
+        list_add_tail(&item->list, &testlist);
+        i++;
+    };
+    printf("data number: %u\n", i);
+
+    /*
+        random_shuffle_array(values, (uint16_t) ARRAY_SIZE(values));
+
+    #ifdef DEBUG
+        printf("Org values: \t");
+        PRINT_ARRAY(i, values);
+    #endif
+    */
+
+    assert(!list_empty(&testlist));
+
+    list_mergesort(&testlist, i);
+
+#ifdef DEBUG
+    printf("testlist:\t");
+    list_for_each_entry (item, &testlist, list) {
+        printf("%d ", item->i);
+    }
+    printf("\n\n");
+#endif
+
+    /*    qsort(values, ARRAY_SIZE(values), sizeof(values[0]), cmpint);
+
+        i = 0;
+        list_for_each_entry_safe (item, is, &testlist, list) {
+            assert(item->i == values[i]);
+            list_del(&item->list);
+            free(item);
+            i++;
+        }
+
+        assert(i == ARRAY_SIZE(values));
+        assert(list_empty(&testlist));
+    */
+}
+
+static void list_mergesort(struct list_head *head, unsigned int n)
 {
     if (list_empty(head) || list_is_singular(head))
         return;
@@ -41,7 +117,7 @@ static void list_mergesort(struct list_head *head, int n)
 
     i = 0;
     struct listitem *l_item1, *r_item1;
-    while (i++ < n) {
+    /*    while (i++ < n) {
         l_item1 = container_of(llist.next, struct listitem, list);
         r_item1 = container_of(rlist->next, struct listitem, list);
         if (cmpint(&l_item1->i, &r_item1->i) < 0) {
@@ -70,55 +146,5 @@ static void list_mergesort(struct list_head *head, int n)
     printf("\n\n");
 #endif
 
-    return;
-}
-
-int main(void)
-{
-    struct list_head testlist;
-    struct listitem *item = NULL, *is = NULL;
-    size_t i;
-
-    random_shuffle_array(values, (uint16_t) ARRAY_SIZE(values));
-
-#ifdef DEBUG
-    printf("Org values: \t");
-    PRINT_ARRAY(i, values);
-#endif
-
-    INIT_LIST_HEAD(&testlist);
-
-    assert(list_empty(&testlist));
-
-    for (i = 0; i < ARRAY_SIZE(values); i++) {
-        item = (struct listitem *) malloc(sizeof(*item));
-        assert(item);
-        item->i = values[i];
-        list_add_tail(&item->list, &testlist);
-    }
-
-    assert(!list_empty(&testlist));
-
-    list_mergesort(&testlist, ARRAY_SIZE(values));
-
-#ifdef DEBUG
-    printf("testlist:\t");
-    list_for_each_entry (item, &testlist, list) {
-        printf("%d ", item->i);
-    }
-    printf("\n\n");
-#endif
-
-    qsort(values, ARRAY_SIZE(values), sizeof(values[0]), cmpint);
-
-    i = 0;
-    list_for_each_entry_safe (item, is, &testlist, list) {
-        assert(item->i == values[i]);
-        list_del(&item->list);
-        free(item);
-        i++;
-    }
-
-    assert(i == ARRAY_SIZE(values));
-    assert(list_empty(&testlist));
+  */ return;
 }

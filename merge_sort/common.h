@@ -9,7 +9,7 @@
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 struct listitem {
-    uint16_t i;
+    char *city;
     struct list_head list;
 };
 

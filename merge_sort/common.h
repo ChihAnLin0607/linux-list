@@ -52,6 +52,13 @@ static inline int cmpint(const void *p1, const void *p2)
     return *i1 - *i2;
 }
 
+static inline int cmpstr(const void *p1, const void *p2)
+{
+    const char **i1 = (const char **) p1;
+    const char **i2 = (const char **) p2;
+    return strcmp(*i1, *i2);
+}
+
 static inline void random_shuffle_array(uint16_t *operations, uint16_t len)
 {
     uint16_t i;
